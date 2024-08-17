@@ -1,0 +1,28 @@
+build:
+  gpu: true
+  cuda: "11.7"
+  python_version: "3.10"
+  system_packages:
+    - "ffmpeg"
+    - "libgl1-mesa-glx"
+    - "libglib2.0-0"
+    - "git"
+    - "wget"
+    - "nvidia-cuda-toolkit"
+  run:
+    - pip install --no-cache-dir --upgrade pip
+    # Layer 1: PyTorch and TorchVision
+    - >
+      pip install --no-cache-dir torch==2.0.1+cu117 torchvision==0.15.2+cu117 
+      --extra-index-url https://download.pytorch.org/whl/cu117
+    # Layer 2: SAM2
+    - pip install --no-cache-dir git+https://github.com/facebookresearch/segment-anything-2.git
+    # Layer 3: Other dependencies
+    - >
+      pip install --no-cache-dir opencv-python==4.7.0.72 numpy==1.23.5 Pillow==9.3.0 
+      matplotlib==3.7.1 pycocotools==2.0.6 scipy==1.10.1 timm==0.6.13 
+      onnxruntime-gpu==1.15.0 onnx==1.14.0
+    # Layer 4: Model and config download
+    - wget https://dl.fbaipublicfiles.com/segment_anything_2/072824/sam2_hiera_large.pt -O /sam2_hiera_large.pt
+
+predict: "predict.py:Predictor"
