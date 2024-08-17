@@ -7,7 +7,6 @@ from cog import BasePredictor, Input, Path
 import logging
 import shutil
 
-
 class Predictor(BasePredictor):
     def setup(self):
         logging.basicConfig(level=logging.INFO)
