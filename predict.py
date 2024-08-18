@@ -10,28 +10,26 @@ import shutil
 class Predictor(BasePredictor):
     def setup(self):
         logging.basicConfig(level=logging.INFO)
+        logging.info("Starting setup")
 
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         logging.info(f"Using device: {self.device}")
-        logging.info(f"CUDA available: {torch.cuda.is_available()}")
-        if torch.cuda.is_available():
-            logging.info(f"CUDA version: {torch.version.cuda}")
-            logging.info(f"GPU: {torch.cuda.get_device_name(0)}")
 
         if self.device == "cuda":
+            torch.cuda.empty_cache()
             torch.autocast(device_type="cuda", dtype=torch.float16).__enter__()
-            if torch.cuda.get_device_properties(0).major >= 8:
-                torch.backends.cuda.matmul.allow_tf32 = True
-                torch.backends.cudnn.allow_tf32 = True
 
-        self.checkpoint = "sam2_hiera_large.pt"
+        self.checkpoint = "/sam2_hiera_large.pt"
         self.model_cfg = "sam2_hiera_l.yaml"
+
         try:
             self.predictor = build_sam2_video_predictor(self.model_cfg, self.checkpoint)
             logging.info("SAM2 predictor built successfully")
         except Exception as e:
             logging.error(f"Error building SAM2 predictor: {e}")
             raise
+
+        logging.info("Setup completed")
 
     def predict(
             self,
